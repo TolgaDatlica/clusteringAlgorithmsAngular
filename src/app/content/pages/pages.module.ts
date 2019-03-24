@@ -11,21 +11,26 @@ import { MainPageService } from './mainpage/mainpage.service';
 import { SecondPageService } from './secondpage/secondpage.service';
 import { KMeansPageComponent } from './kmeanspage/kmeanspage.component';
 import { KMeansPageService } from './kmeanspage/kmeanspage.service';
+import { GnssPageComponent } from './gnss/gnss.component';
+import { GnssService } from './gnss/gnss.service';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { PlotlyModule } from 'angular-plotly.js';
 @NgModule({
 	imports: [
 		CommonModule,
 		HttpClientModule,
 		FormsModule,
 		PagesRoutingModule,
-		NgbModule
+		NgbModule,
+		PlotlyModule
 	],
 	declarations: [
 		PagesComponent,
 		MainPageComponent,
 		SecondPageComponent,
-		KMeansPageComponent
+		KMeansPageComponent,
+		GnssPageComponent
 	],
-	providers: [MainPageService, SecondPageService, KMeansPageService]
+	providers: [MainPageService, SecondPageService, KMeansPageService, GnssService]
 })
 export class PagesModule { }

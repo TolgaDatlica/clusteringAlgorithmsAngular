@@ -1,6 +1,3 @@
-<div class="alert alert-primary" role="alert">
-  A simple primary alert—check it out!
-</div>
 <form name="form" #f="ngForm">
   <div class="row justify-content-md-center">
     <div class="form-group col-sm-1">
@@ -24,14 +21,25 @@
   </div>
   <div class="row">
     <div class="col-sm">
+        <div class="form-row">
+            <div class="col">
+              <input type="text" name="epsilon" [(ngModel)] = "epsilon" class="form-control" placeholder="Epsilon">
+            </div>
+            <div class="col">
+              <input type="text" name="minpoints" [(ngModel)] = "minpoints"  class="form-control" placeholder="Min Cluster Size">
+            </div>
+          </div>
       <div class="form-group">
-        <label for="textjson">Example textarea</label>
+        <label for="textjson">JSON Textarea</label>
         <textarea name='textjson' [(ngModel)]="model.textjson" class="form-control" id="textjson" rows="100"></textarea>
       </div>
     </div>
     <div class="col-sm">
       <ngb-tabset>
-        <ngb-tab title="Table">
+        <ngb-tab>
+          <ng-template ngbTabTitle>
+            <div><b>Tablo</b></div>
+          </ng-template>
           <ng-template ngbTabContent>
             <table class="table table-striped">
               <thead>
@@ -56,22 +64,22 @@
           </ng-template>
         </ngb-tab>
         <ngb-tab>
-          <ng-template ngbTabTitle ><div (click)="updatemap();"><b>Harita</b></div></ng-template>
+          <ng-template ngbTabTitle>
+            <div (click)="updatemap();"><b>Harita</b></div>
+          </ng-template>
           <ng-template ngbTabContent>
-            <div class="map" id="map2" style="display: block; height: 100%;">
+            <div id='mapwrapper'>
+              <div class="map" id="map2" style="display: block; height: 100%;">
+              </div>
             </div>
           </ng-template>
         </ngb-tab>
-        <ngb-tab title="Disabled" [disabled]="true">
+        <ngb-tab>
+          <ng-template ngbTabTitle>
+            <div><b>Grafik</b></div>
+          </ng-template>
           <ng-template ngbTabContent>
-            <p>Sed commodo, leo at suscipit dictum, quam est porttitor sapien, eget sodales nibh elit id diam. Nulla
-              facilisi. Donec egestas ligula vitae odio interdum aliquet. Duis lectus turpis, luctus eget tincidunt eu,
-              congue et odio. Duis pharetra et nisl at faucibus. Quisque luctus pulvinar arcu, et molestie lectus
-              ultrices et. Sed diam urna, egestas ut ipsum vel, volutpat volutpat neque. Praesent fringilla tortor arcu.
-              Vivamus faucibus nisl enim, nec tristique ipsum euismod facilisis. Morbi ut bibendum est, eu tincidunt
-              odio. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris
-              aliquet odio ac lorem aliquet ultricies in eget neque. Phasellus nec tortor vel tellus pulvinar feugiat.
-            </p>
+              <plotly-plot [data]="graph.data" [layout]="graph.layout"></plotly-plot>
           </ng-template>
         </ngb-tab>
       </ngb-tabset>

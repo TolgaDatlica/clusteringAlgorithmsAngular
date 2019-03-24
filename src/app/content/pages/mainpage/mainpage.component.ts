@@ -26,6 +26,12 @@ import { toStringHDMS } from 'ol/coordinate';
   templateUrl: './mainpage.component.html',
 })
 export class MainPageComponent implements OnInit, AfterViewInit {
+  public graph = {
+    data: [],
+    layout: { width: 600, height: 700, title: 'Graph' }
+  };
+  a = []; b = []; c = [];
+  d = []; e = []; g = [];
   // Map initliaze kullanılanlar
   view = new View({});
   map = new Map({});
@@ -56,16 +62,13 @@ export class MainPageComponent implements OnInit, AfterViewInit {
   };
   wifilist = [];
   constructor(private mainPageService: MainPageService, private renderer: Renderer2, private elementRef: ElementRef,
-              private sampleService: MainPageService) {
+    private sampleService: MainPageService) {
   }
   ngAfterViewInit() {
   }
   ngOnInit() {
     this.model.textjson = JSON.stringify(this.sampleService.sampleData1);
     setTimeout(() => {
-      // document.getElementById('map').style.height =
-      //   document.getElementsByTagName('html')[0].clientHeight - document.getElementsByTagName('header')[0].clientHeight + 'px';
-      // this.resizeSubscription = this._resizeService.onResize$.subscribe(size => this.map.updateSize());
       this.googleMap = new TileLayer({
         source: new XYZ({
           url: 'http://mt{0-3}.google.com/vt/lyrs=m@355000000&hl=tr&x={x}&s=&y={y}&z={z}',
@@ -85,33 +88,70 @@ export class MainPageComponent implements OnInit, AfterViewInit {
 
   }
   submit() {
-    this.wifilist = [];
     try {
+      this.wifilist = [];
       const parsedJSON = JSON.parse(this.model.textjson);
+      let counter = 1;
+      const lengtAll = parsedJSON.WIFI.length;
+      if (lengtAll === 0) {
+        alert('En az 1 wifi bilgisi bulunmalıdır.');
+        return;
+      }
       parsedJSON.WIFI.forEach(element => {
         this.mainPageService.getWifiResult(element.MAC).subscribe(res => {
           if (res.result === 200) {
             this.wifilist.push({
               lat: res.data.lat,
               lon: res.data.lon,
-              mac: element.MAC
+              mac: element.MAC,
+              cluster: '',
+              clusterNumber: Math.floor(Math.random() * 1000) + 100
             });
           } else {
             this.model.textjson += '<br/>' + ' hata';
             this.wifilist.push({
               lat: 0,
               lon: 0,
-              mac: element.MAC + ' (HATA)'
+              mac: element.MAC + ' (HATA)',
+              cluster: '',
+              clusterNumber: Math.floor(Math.random() * 1000) + 100
             });
           }
-        });
+          if (counter === lengtAll) {
+            this.map = null;
+            this.updatemap();
+            this.graphCreate();
+          }
+          counter++;
+        },
+          err => {
+            console.error(err);
+            if (counter === lengtAll) {
+              this.map = null;
+              this.updatemap();
+              this.graphCreate();
+            }
+            counter++;
+          });
       });
     } catch (error) {
       alert(error);
     }
   }
   updatemap() {
+    if (!this.wifilist) {
+      alert('Henüz gösterilecek veri girilmedi');
+      return;
+    }
     setTimeout(() => {
+      document.getElementById('map2').remove();
+      const divMap = this.renderer.createElement('div');
+      this.renderer.setStyle(divMap, 'display', 'block');
+      this.renderer.setStyle(divMap, 'height', '100%');
+      this.renderer.setAttribute(divMap, 'id', 'map2');
+      document.getElementById('mapwrapper').appendChild(divMap);
+      document.getElementById('map2').style.height =
+        document.getElementsByTagName('html')[0].clientHeight + 'px';
       this.initMap();
       // document.getElementById('map').style.height =
       //   document.getElementsByTagName('html')[0].clientHeight - document.getElementsByTagName('header')[0].clientHeight + 'px';
@@ -159,7 +199,7 @@ export class MainPageComponent implements OnInit, AfterViewInit {
         new interaction.MouseWheelZoom({ duration: 0 })
       ]),
       loadTilesWhileAnimating: true,
-      target: 'map',
+      target: 'map2',
       controls: control.defaults({
         attributionOptions: ({
           collapsible: false,
@@ -173,29 +213,6 @@ export class MainPageComponent implements OnInit, AfterViewInit {
       });
     }
     this.focusToGroup(this.wifilist);
-    // this._mapsService.getTerminalsAll().subscribe(p => {
-    //   p.forEach(d => {
-    //     this.addMarkerWithHeading(d);
-    //     this.terminalList.push(d);
-    //   });
-    //   this.focusToGroup(this.terminalList);
-    //   this.mapFocusWithParameter(null);
-    // });
-    // this.map.on('singleclick', (evt) => {
-    //   const feature = this.map.forEachFeatureAtPixel(evt.pixel,
-    //     function (f) {
-    //       return f;
-    //     }); // gets feature on top layer
-
-    //   if (feature && feature.get('terminal') && feature.get('terminal')) {
-    //     const terminal = this.terminalList.find(p => p.Id === feature.get('terminal').Id);
-    //     this.selectedTerminal = Object.assign({}, terminal);
-    //     this.map.addOverlay(this.popup);
-    //     const coordinate = evt.coordinate;
-    //     this.content.innerHTML = this.createPopUpContent(terminal);
-    //     this.popup.setPosition(coordinate);
-    //   }
-    // });
   }
   addMarkerWithHeading(terminal: any) {
     if (terminal) {
@@ -223,13 +240,13 @@ export class MainPageComponent implements OnInit, AfterViewInit {
         opacity: 0.9,
         rotateWithView: true,
         // rotation: terminal.Heading * Math.PI / 180,
-        src: 'assets/gaming.png',
+        src: this.mainPageService.getColorIcon(terminal.clusterNumber).Icon,
         scale: 0.7,
         snapToPixel: false,
         zIndex: 11
       });
       const circle = '●';
-      const tName = terminal.mac;
+      const tName = terminal.mac + ' (' + terminal.clusterNumber + ')';
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       context.font = '11px roboto,sans-serif';
@@ -347,6 +364,35 @@ export class MainPageComponent implements OnInit, AfterViewInit {
     } else if (datanumber === 5) {
       this.model.textjson = JSON.stringify(this.sampleService.sampleData5);
     }
+  }
+  graphCreate() {
+    const usedElements = [];
+    this.wifilist.forEach(element => {
+      if (usedElements.filter(x => x.name == element.clusterNumber).length > 0) {
+        const findedElement = usedElements.filter(x => x.name == element.clusterNumber)[0];
+        findedElement.x.push(element.lat);
+        findedElement.y.push(element.lon);
+        findedElement.text.push(element.mac);
+      } else {
+        usedElements.push(
+          {
+            x: [element.lat],
+            y: [element.lon],
+            mode: 'markers+text',
+            type: 'scatter',
+            name: element.clusterNumber,
+            text: [element.mac],
+            textposition: 'top center',
+            textfont: {
+              family: 'Raleway, sans-serif'
+            },
+            marker: { size: 12 }
+          }
+        );
+      }
+    });
+    var sampledata = usedElements;
+    this.graph.data = sampledata;
   }
 }
 

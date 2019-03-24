@@ -37,6 +37,8 @@ export class KMeansPageService {
         // const polygonObject = polygon([
         //     (listlocation.map(x => [x.lon, x.lat]))]
         // );
+        debugger;
+        console.log('kmeanscluster');
         return clustersKmeans(listofoptions, { numberOfClusters: ClusterNumber });
     }
     public centerOfElements(centroidElements) {

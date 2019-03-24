@@ -4,7 +4,7 @@ import { PagesComponent } from './pages.component';
 import { MainPageComponent } from './mainpage/mainpage.component';
 import { SecondPageComponent } from './secondpage/secondpage.component';
 import { KMeansPageComponent } from './kmeanspage/kmeanspage.component';
-
+import { GnssPageComponent } from './gnss/gnss.component';
 const routes: Routes = [
 	{
 		path: '',
@@ -17,6 +17,10 @@ const routes: Routes = [
 	{
 		path: 'kmeans1',
 		component: KMeansPageComponent,
+	},
+	{
+		path: 'gnss',
+		component: GnssPageComponent,
 	},
 ];
 

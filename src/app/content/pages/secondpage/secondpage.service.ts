@@ -16,7 +16,8 @@ export class SecondPageService {
             )
             );
     }
-    public dbscancluster(pointsElement, minpoints) {
+    public dbscancluster(pointsElement, minpoints, epsilon) {
+        debugger;
         const listlocation = [];
         pointsElement.forEach(element => {
             listlocation.push([element.lon, element.lat]);
@@ -25,7 +26,7 @@ export class SecondPageService {
         // const polygonObject = polygon([
         //     (listlocation.map(x => [x.lon, x.lat]))]
         // );
-        return clustersDbscan(listofoptions, 0.045, { minPoints: minpoints });
+        return clustersDbscan(listofoptions, epsilon, { minPoints: minpoints });
         // 0.015 dar alan kümelemesi
     }
     public kmeanscluster(pointsElement, ClusterNumber) {

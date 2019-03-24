@@ -4,9 +4,9 @@ import { map, catchError, tap, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 @Injectable()
-export class MainPageService {
+export class GnssService {
     // tslint:disable-next-line:max-line-length
-    public sampleData1 = {"Cmd":"Position","Et":"5C94BBE1","IMEI":"864547036476625","Type":"53","Source":"1","Lat":"0.00000","Long":"0.00000","Alt":"0","Error":"0","Batt":"3775","WIFI":[{"MAC":"00:1c:7b:78:c0:76","SSID":"","RSSI":"-84"},{"MAC":"b0:4e:26:b9:b4:b0","SSID":"","RSSI":"-84"},{"MAC":"a0:e4:cb:b0:63:77","SSID":"","RSSI":"-90"},{"MAC":"5c:f4:ab:49:11:88","SSID":"","RSSI":"-90"},{"MAC":"90:ef:68:12:a8:43","SSID":"","RSSI":"-89"},{"MAC":"f8:a9:63:b8:91:33","SSID":"","RSSI":"-92"},{"MAC":"88:d7:f6:5e:4f:c0","SSID":"","RSSI":"-93"}],"Temp":"26.8","CRC":"B12F"}
+    public sampleData1 = {"Cmd":"Position","Et":"5C94BBE1","IMEI":"864547036476625","Type":"53","Source":"1","Lat":"0.00000","Long":"0.00000","Alt":"0","Error":"0","Batt":"3775","Location":[{"Lat":"39.87566021092","Lon":"32.86341688606"},{"Lat":"39.87562467057","Lon":"32.86352225391"},{"Lat":"39.87597479544","Lon":"32.8638360008"},{"Lat":"39.87566747332","Lon":"32.86352474914"},{"Lat":"39.87625720986","Lon":"32.86293844087"},{"Lat":"52.38233245992","Lon":"4.89938774784"},{"Lat":"39.87540935585","Lon":"32.86346663242"}],"Temp":"26.8","CRC":"B12F"};
     // tslint:disable-next-line:max-line-length
     public sampleData2 = {"Cmd":"Position","Et":"386D194D","IMEI":"358021087096511","Type":"54","Source":"1","Lat":"0.0","Long":"0.0","Alt":"0","Error":"0","Batt":"4110","WIFI":[{"MAC":"9c:4f:cf:56:c3:bc","SSID":"","RSSI":"-91"},{"MAC":"d8:c7:c8:12:ab:c1","SSID":"","RSSI":"-80"},{"MAC":"50:04:b8:27:d2:73","SSID":"","RSSI":"-91"},{"MAC":"d4:6e:0e:e9:37:a8","SSID":"","RSSI":"-79"},{"MAC":"d8:c7:c8:12:ad:20","SSID":"","RSSI":"-75"},{"MAC":"d4:6e:0e:dd:37:da","SSID":"","RSSI":"-84"},{"MAC":"ec:08:6b:d6:c2:46","SSID":"","RSSI":"-90"},{"MAC":"d8:c7:c8:12:97:c3","SSID":"","RSSI":"-69"},{"MAC":"d8:c7:c8:12:a6:e3","SSID":"","RSSI":"-87"},{"MAC":"ec:08:6b:fa:56:12","SSID":"","RSSI":"-92"}],"CRC":"3434"};
     // tslint:disable-next-line:max-line-length

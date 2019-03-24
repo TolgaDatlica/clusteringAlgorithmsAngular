@@ -27,7 +27,14 @@ import { toStringHDMS } from 'ol/coordinate';
   templateUrl: './secondpage.component.html',
 })
 export class SecondPageComponent implements OnInit, AfterViewInit {
+  public graph = {
+    data: [],
+    layout: { width: 600, height: 700, title: 'DBSCAN' }
+  };
+  a = []; b = []; c = [];
+  d = []; e = []; g = [];
   minpoints = 2;
+  epsilon = 0.045;
   // Map initliaze kullanılanlar
   view = new View({});
   map = new Map({});
@@ -58,15 +65,14 @@ export class SecondPageComponent implements OnInit, AfterViewInit {
   };
   wifilist = [];
   constructor(private mainPageService: SecondPageService, private renderer: Renderer2, private elementRef: ElementRef,
-              private sampleService: MainPageService) {
+    private sampleService: MainPageService) {
   }
   ngAfterViewInit() {
   }
   ngOnInit() {
     this.model.textjson = JSON.stringify(this.sampleService.sampleData1);
     setTimeout(() => {
-      // document.getElementById('map').style.height =
-      //   document.getElementsByTagName('html')[0].clientHeight - document.getElementsByTagName('header')[0].clientHeight + 'px';
+
       // this.resizeSubscription = this._resizeService.onResize$.subscribe(size => this.map.updateSize());
       this.googleMap = new TileLayer({
         source: new XYZ({
@@ -92,6 +98,10 @@ export class SecondPageComponent implements OnInit, AfterViewInit {
       const parsedJSON = JSON.parse(this.model.textjson);
       let counter = 1;
       const lengtAll = parsedJSON.WIFI.length;
+      if (lengtAll < 4) {
+        alert('En az 4 wifi bilgisi bulunmalıdır.');
+        return;
+      }
       parsedJSON.WIFI.forEach(element => {
         this.mainPageService.getWifiResult(element.MAC).subscribe(res => {
           if (res.result === 200) {
@@ -100,7 +110,7 @@ export class SecondPageComponent implements OnInit, AfterViewInit {
               lon: res.data.lon,
               mac: element.MAC,
               cluster: '',
-              clusterNumber: Math.floor(Math.random() * 1000) + 1
+              clusterNumber: Math.floor(Math.random() * 1000) + 100
             });
           } else {
             this.model.textjson += '<br/>' + ' hata';
@@ -109,7 +119,7 @@ export class SecondPageComponent implements OnInit, AfterViewInit {
               lon: 0,
               mac: element.MAC + ' (HATA)',
               cluster: '',
-              clusterNumber: Math.floor(Math.random() * 1000) + 1
+              clusterNumber: Math.floor(Math.random() * 1000) + 100
             });
           }
           if (counter === lengtAll) {
@@ -118,19 +128,38 @@ export class SecondPageComponent implements OnInit, AfterViewInit {
             console.log(result);
             let counterinner = 0;
             result.features.forEach(e => {
-              debugger;
               this.wifilist[counterinner].cluster =
-              ((e.properties.cluster || e.properties.cluster === 0) ? e.properties.cluster : this.wifilist[counterinner].clusterNumber) + ' (' + e.properties.dbscan + ')';
+                ((e.properties.cluster || e.properties.cluster === 0) ? e.properties.cluster : this.wifilist[counterinner].clusterNumber) + ' (' + e.properties.dbscan + ')';
               this.wifilist[counterinner].clusterNumber =
-              ((e.properties.cluster || e.properties.cluster === 0) ? e.properties.cluster : this.wifilist[counterinner].clusterNumber);
+                ((e.properties.cluster || e.properties.cluster === 0) ? e.properties.cluster : this.wifilist[counterinner].clusterNumber);
 
               counterinner++;
             });
+            this.map = null;
+            this.updatemap();
+            this.graphCreate();
           }
           counter++;
         },
           err => {
             console.error(err);
+            if (counter === lengtAll) {
+              const result = this.clusterCordinates(this.wifilist);
+              console.log('DBSCAN');
+              console.log(result);
+              let counterinner = 0;
+              result.features.forEach(e => {
+                this.wifilist[counterinner].cluster =
+                  ((e.properties.cluster || e.properties.cluster === 0) ? e.properties.cluster : this.wifilist[counterinner].clusterNumber) + ' (' + e.properties.dbscan + ')';
+                this.wifilist[counterinner].clusterNumber =
+                  ((e.properties.cluster || e.properties.cluster === 0) ? e.properties.cluster : this.wifilist[counterinner].clusterNumber);
+
+                counterinner++;
+              });
+              this.map = null;
+              this.updatemap();
+              this.graphCreate();
+            }
             counter++;
           });
       });
@@ -139,10 +168,22 @@ export class SecondPageComponent implements OnInit, AfterViewInit {
     }
   }
   clusterCordinates(postions) {
-    return this.mainPageService.dbscancluster(postions, this.minpoints);
+    return this.mainPageService.dbscancluster(postions, this.minpoints, this.epsilon);
   }
   updatemap() {
+    if (!this.wifilist || this.wifilist.length < 4) {
+      alert('Henüz gösterilecek veri girilmedi');
+      return;
+    }
     setTimeout(() => {
+      document.getElementById('map2').remove();
+      const divMap = this.renderer.createElement('div');
+      this.renderer.setStyle(divMap, 'display', 'block');
+      this.renderer.setStyle(divMap, 'height', '100%');
+      this.renderer.setAttribute(divMap, 'id', 'map2');
+      document.getElementById('mapwrapper').appendChild(divMap);
+      document.getElementById('map2').style.height =
+        document.getElementsByTagName('html')[0].clientHeight + 'px';
       this.initMap();
       // document.getElementById('map').style.height =
       //   document.getElementsByTagName('html')[0].clientHeight - document.getElementsByTagName('header')[0].clientHeight + 'px';
@@ -315,13 +356,10 @@ export class SecondPageComponent implements OnInit, AfterViewInit {
       m = 0;
     }
     const maxEl = item;
-    console.log(item);
-    debugger;
     const centroidElements = item || item === 0 ? positions.filter(officer => officer.clusterNumber === maxEl) : positions;
     centroidElements.push(centroidElements[0]);
     const centerpoint = this.mainPageService.centerOfElements(centroidElements);
     centerpoint.mac = id;
-    console.log(centerpoint);
     this.addMarkerWithHeading(centerpoint);
   }
   focusToGroup(group) {
@@ -386,6 +424,35 @@ export class SecondPageComponent implements OnInit, AfterViewInit {
     } else if (datanumber === 5) {
       this.model.textjson = JSON.stringify(this.sampleService.sampleData5);
     }
+  }
+  graphCreate() {
+    const usedElements = [];
+    this.wifilist.forEach(element => {
+      if(usedElements.filter(x => x.name == element.clusterNumber).length > 0) {
+        const findedElement = usedElements.filter(x => x.name == element.clusterNumber)[0];
+        findedElement.x.push(element.lat);
+        findedElement.y.push(element.lon);
+        findedElement.text.push(element.mac);
+      } else {
+        usedElements.push(
+          {
+            x: [element.lat],
+            y: [element.lon],
+            mode: 'markers+text',
+            type: 'scatter',
+            name: element.clusterNumber,
+            text: [element.mac],
+            textposition: 'top center',
+            textfont: {
+              family:  'Raleway, sans-serif'
+            },
+            marker: { size: 12 }
+          }
+        );
+      }     
+    });
+    var sampledata = usedElements;
+    this.graph.data = sampledata;
   }
 }
 
