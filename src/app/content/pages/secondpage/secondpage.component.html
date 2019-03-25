@@ -82,6 +82,17 @@
               <plotly-plot [data]="graph.data" [layout]="graph.layout"></plotly-plot>
           </ng-template>
         </ngb-tab>
+        <ngb-tab>
+          <ng-template ngbTabTitle>
+            <div (click)="updatemap();"><b>Isı Haritası</b></div>
+          </ng-template>
+          <ng-template ngbTabContent>
+            <div id='heatmapwrapper'>
+              <div class="map" id="heatmap2" style="display: block; height: 100%;">
+              </div>
+            </div>
+          </ng-template>
+        </ngb-tab>
       </ngb-tabset>
     </div>
   </div>

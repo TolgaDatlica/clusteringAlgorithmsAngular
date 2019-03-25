@@ -35,6 +35,8 @@ export class GnssPageComponent implements OnInit, AfterViewInit {
   // Map initliaze kullanılanlar
   view = new View({});
   map = new Map({});
+  heatmapview = new View({});
+  heatmap = new Map({});
   popup = new Overlay({});
   element: any;
   public markerIndex = 0;
@@ -55,6 +57,23 @@ export class GnssPageComponent implements OnInit, AfterViewInit {
     source: this.vectorSource,
     visible: true,
     zIndex: 101
+  });
+  /** Isı Haritası için */
+  strokeDrawStyle = new style.Stroke({
+    color: 'blue',
+    width: 3
+  });
+  styleDrawStyle = [
+    new style.Style({
+      stroke: this.strokeDrawStyle
+    })
+
+  ];
+  heatmapvectorSource = new Vector({});
+  heatmaplayer: any = new layer.Heatmap({
+    source: this.heatmapvectorSource,
+    blur: 18,
+    radius: 8
   });
   @ViewChild('f') f: NgForm;
   model: any = {
@@ -107,8 +126,8 @@ export class GnssPageComponent implements OnInit, AfterViewInit {
         });
         counter++;
       });
-      debugger;
       this.map = null;
+      this.heatmap = null;
       this.updatemap();
       this.graphCreate();
     } catch (error) {
@@ -121,19 +140,35 @@ export class GnssPageComponent implements OnInit, AfterViewInit {
       return;
     }
     setTimeout(() => {
-      document.getElementById('map2').remove();
-      const divMap = this.renderer.createElement('div');
-      this.renderer.setStyle(divMap, 'display', 'block');
-      this.renderer.setStyle(divMap, 'height', '100%');
-      this.renderer.setAttribute(divMap, 'id', 'map2');
-      document.getElementById('mapwrapper').appendChild(divMap);
-      document.getElementById('map2').style.height =
-        document.getElementsByTagName('html')[0].clientHeight + 'px';
+      /** Map Sizes */
+      if (document.getElementById('map2')) {
+        document.getElementById('map2').remove();
+        const divMap = this.renderer.createElement('div');
+        this.renderer.setStyle(divMap, 'display', 'block');
+        this.renderer.setStyle(divMap, 'height', '100%');
+        this.renderer.setAttribute(divMap, 'id', 'map2');
+        document.getElementById('mapwrapper').appendChild(divMap);
+        document.getElementById('map2').style.height =
+          document.getElementsByTagName('html')[0].clientHeight + 'px';
+      }
+      /* Heat Map Sizes */
+      if (document.getElementById('heatmap2')) {
+        document.getElementById('heatmap2').remove();
+        const divHeatMap = this.renderer.createElement('div');
+        this.renderer.setStyle(divHeatMap, 'display', 'block');
+        this.renderer.setStyle(divHeatMap, 'height', '100%');
+        this.renderer.setAttribute(divHeatMap, 'id', 'heatmap2');
+        document.getElementById('heatmapwrapper').appendChild(divHeatMap);
+        document.getElementById('heatmap2').style.height =
+          document.getElementsByTagName('html')[0].clientHeight + 'px';
+      }
+      /* İnit Map */
       this.initMap();
       // document.getElementById('map').style.height =
       //   document.getElementsByTagName('html')[0].clientHeight - document.getElementsByTagName('header')[0].clientHeight + 'px';
       this.map.updateSize();
-    }, 1000);
+      this.heatmap.updateSize();
+    }, 100);
   }
   initMap() {
     this.view = new View({
@@ -184,6 +219,37 @@ export class GnssPageComponent implements OnInit, AfterViewInit {
       }).extend([this.mapHybridControl]),
       view: this.view
     });
+    this.heatmapview = new View({
+      center: proj.fromLonLat([this.mapSetting.Longitude, this.mapSetting.Latitude]),
+      zoom: this.mapSetting.Zoom,
+      minZoom: 3,
+      maxZoom: 20
+    });
+    this.heatmap = new Map({
+      /*Simülasyon için VectorLayer eklendi*/
+      layers: [
+        this.googleMap,
+        this.heatmaplayer,
+      ],
+      interactions: interaction.defaults({
+        dragPan: false,
+        mouseWheelZoom: false
+      }).extend([
+        new interaction.DragPan({ kinetic: false }),
+        new interaction.MouseWheelZoom({ duration: 0 })
+      ]),
+      loadTilesWhileAnimating: true,
+      target: 'heatmap2',
+      controls: control.defaults({
+        attributionOptions: ({
+          collapsible: false,
+        })
+      }).extend([this.mapHybridControl]),
+      view: this.heatmapview
+    });
+
+    this.DrawHeatmap(this.locationlist);
+
     if (this.locationlist.length > 0) {
       this.locationlist.forEach(d => {
         this.addMarkerWithHeading(d);
@@ -371,6 +437,34 @@ export class GnssPageComponent implements OnInit, AfterViewInit {
     });
     var sampledata = usedElements;
     this.graph.data = sampledata;
+  }
+  DrawHeatmap(geoObject) {
+    const innerMapShortcutPositionArray = geoObject;
+    const listResult = [];
+    let counter = 0;
+    innerMapShortcutPositionArray.forEach(element => {
+      counter++;
+      listResult.push(proj.fromLonLat([element.lon, element.lat]));
+
+    });
+    Object.keys(this.heatmapvectorSource.idIndex_).forEach(element => {
+        this.heatmapvectorSource.removeFeature(this.heatmapvectorSource.getFeatureById(element));
+    });
+
+    counter = 0;
+    listResult.forEach(element => {
+      const featureSquare = new Feature({
+        geometry: new geom.Point(element),
+        // weight: 20,
+        name: 'HeatMap',
+        Id: 'HeatMap',
+        type: 'HeatMap',
+        zIndex: 99
+      });
+      featureSquare.setId(geoObject[counter].mac);
+      this.heatmapvectorSource.addFeature(featureSquare);
+      counter++;
+    });
   }
 }
 
