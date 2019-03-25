@@ -1,6 +1,6 @@
 
 import { Component, OnInit, ViewChild, AfterViewInit, Renderer2, ElementRef } from '@angular/core';
-import { KMeansPageService } from './kmeanspage.service';
+import { GnssKMeansPageService } from './gnsskmeanspage.service';
 import { NgForm } from '@angular/forms';
 import Map from 'ol/Map';
 import Vector from 'ol/source/Vector';
@@ -22,11 +22,11 @@ import { toLonLat } from 'ol/proj';
 import { toStringHDMS } from 'ol/coordinate';
 import { MainPageService } from '../mainpage/mainpage.service';
 @Component({
-  selector: 'kmeanspage',
-  styleUrls: ['kmeanspage.component.scss'],
-  templateUrl: './kmeanspage.component.html',
+  selector: 'gnsskmeanspage',
+  styleUrls: ['gnsskmeanspage.component.scss'],
+  templateUrl: './gnsskmeanspage.component.html',
 })
-export class KMeansPageComponent implements OnInit, AfterViewInit {
+export class GnssKMeansPageComponent implements OnInit, AfterViewInit {
   public graph = {
     data: [],
     layout: { width: 600, height: 700, title: 'KMeans' }
@@ -62,9 +62,9 @@ export class KMeansPageComponent implements OnInit, AfterViewInit {
   model: any = {
     textjson: 'giriniz3'
   };
-  wifilistKMeans = [];
-  constructor(private mainPageService: KMeansPageService, private renderer: Renderer2, private elementRef: ElementRef,
-    private sampleService: MainPageService) {
+  locationlistKMeans = [];
+  constructor(private mainPageService: GnssKMeansPageService, private renderer: Renderer2, private elementRef: ElementRef,
+    private sampleService: GnssKMeansPageService) {
   }
   ngAfterViewInit() {
   }
@@ -94,79 +94,43 @@ export class KMeansPageComponent implements OnInit, AfterViewInit {
   }
   submit() {
     try {
-      this.wifilistKMeans = [];
+      this.locationlistKMeans = [];
       const parsedJSON = JSON.parse(this.model.textjson);
       let counter = 1;
-      const lengtAll = parsedJSON.WIFI.length;
-      parsedJSON.WIFI.forEach(element => {
-        this.mainPageService.getWifiResult(element.MAC).subscribe(res => {
-          if (res.result === 200) {
-            this.wifilistKMeans.push({
-              lat: res.data.lat,
-              lon: res.data.lon,
-              mac: element.MAC,
-              cluster: '',
-              clusterNumber: Math.floor(Math.random() * 1000) + 100
-            });
-          } else {
-            this.model.textjson += '<br/>' + ' hata';
-            this.wifilistKMeans.push({
-              lat: 0,
-              lon: 0,
-              mac: element.MAC + ' (HATA)',
-              cluster: '',
-              clusterNumber: Math.floor(Math.random() * 1000) + 100
-            });
-          }
-          if (counter === lengtAll) {
-            const resultKMeans = this.clusterCordinatesKMeans(this.wifilistKMeans);
-            console.log('KMeans');
-            console.log(resultKMeans);
-            let counterinner = 0;
-            resultKMeans.features.forEach(e => {
-              this.wifilistKMeans[counterinner].cluster = e.properties.cluster;
-              this.wifilistKMeans[counterinner].clusterNumber =
-                ((e.properties.cluster || e.properties.cluster === 0) ? e.properties.cluster : this.wifilistKMeans[counterinner].clusterNumber);
-              this.wifilistKMeans[counterinner].centroid = { lat: e.properties.centroid[1], lon: e.properties.centroid[0] };
-              counterinner++;
-            });
-            this.map = null;
-            this.updatemap();
-            this.graphCreate();
-          }
-          counter++;
-        },
-          err => {
-            console.error(err);
-            if (counter === lengtAll) {
-              const resultKMeans = this.clusterCordinatesKMeans(this.wifilistKMeans);
-              console.log('KMeans');
-              console.log(resultKMeans);
-              let counterinner = 0;
-              resultKMeans.features.forEach(e => {
-                this.wifilistKMeans[counterinner].cluster = e.properties.cluster;
-                this.wifilistKMeans[counterinner].clusterNumber =
-                  ((e.properties.cluster || e.properties.cluster === 0) ? e.properties.cluster : this.wifilistKMeans[counterinner].clusterNumber);
-                this.wifilistKMeans[counterinner].centroid = { lat: e.properties.centroid[1], lon: e.properties.centroid[0] };
-                counterinner++;
-              });
-              this.map = null;
-              this.updatemap();
-              this.graphCreate();
-            }
-            counter++;
-          });
+      parsedJSON.Location.forEach(element => {
+        this.locationlistKMeans.push({
+          lat: parseFloat(element.Lat),
+          lon: parseFloat(element.Lon),
+          mac: counter.toString(),
+          cluster: counter.toString(),
+          clusterNumber: counter
+        });
+        counter++;
       });
+      const resultKMeans = this.clusterCordinatesKMeans(this.locationlistKMeans);
+      console.log('KMeans');
+      console.log(resultKMeans);
+      let counterinner = 0;
+      resultKMeans.features.forEach(e => {
+        this.locationlistKMeans[counterinner].cluster = e.properties.cluster;
+        this.locationlistKMeans[counterinner].clusterNumber =
+          ((e.properties.cluster || e.properties.cluster === 0) ? e.properties.cluster : this.locationlistKMeans[counterinner].clusterNumber);
+        this.locationlistKMeans[counterinner].centroid = { lat: e.properties.centroid[1], lon: e.properties.centroid[0] };
+        counterinner++;
+      });
+      this.map = null;
+      debugger;
+      this.updatemap();
+      this.graphCreate();
     } catch (error) {
       alert(error);
     }
   }
   clusterCordinatesKMeans(postions) {
-    debugger;
     return this.mainPageService.kmeanscluster(postions, this.numberOfClusters);
   }
   updatemap() {
-    if (!this.wifilistKMeans) {
+    if (!this.locationlistKMeans) {
       alert('Henüz gösterilecek veri girilmedi');
       return;
     }
@@ -234,13 +198,13 @@ export class KMeansPageComponent implements OnInit, AfterViewInit {
       }).extend([this.mapHybridControl]),
       view: this.view
     });
-    if (this.wifilistKMeans.length > 0) {
-      this.locatecentroidKMeans(this.wifilistKMeans, 'KMEANS');
-      this.wifilistKMeans.forEach(d => {
+    if (this.locationlistKMeans.length > 0) {
+      this.locatecentroidKMeans(this.locationlistKMeans, 'KMEANS');
+      this.locationlistKMeans.forEach(d => {
         this.addMarkerWithHeading(d);
       });
     }
-    this.focusToGroup(this.wifilistKMeans);
+    this.focusToGroup(this.locationlistKMeans);
   }
   addMarkerWithHeading(terminal: any) {
     if (terminal) {
@@ -425,7 +389,7 @@ export class KMeansPageComponent implements OnInit, AfterViewInit {
   }
   graphCreate() {
     const usedElements = [];
-    this.wifilistKMeans.forEach(element => {
+    this.locationlistKMeans.forEach(element => {
       if (usedElements.filter(x => x.name == element.clusterNumber).length > 0) {
         const findedElement = usedElements.filter(x => x.name == element.clusterNumber)[0];
         findedElement.x.push(element.lat);

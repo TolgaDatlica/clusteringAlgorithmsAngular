@@ -15,6 +15,10 @@ import { GnssPageComponent } from './gnss/gnss.component';
 import { GnssService } from './gnss/gnss.service';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PlotlyModule } from 'angular-plotly.js';
+import { GnssDbscanPageComponent } from './gnssdbscan/gnssdbscan.component';
+import { GnssDbscanService } from './gnssdbscan/gnssdbscan.service';
+import { GnssKMeansPageComponent } from './gnsskmeans/gnsskmeanspage.component';
+import { GnssKMeansPageService } from './gnsskmeans/gnsskmeanspage.service';
 @NgModule({
 	imports: [
 		CommonModule,
@@ -29,8 +33,10 @@ import { PlotlyModule } from 'angular-plotly.js';
 		MainPageComponent,
 		SecondPageComponent,
 		KMeansPageComponent,
-		GnssPageComponent
+		GnssPageComponent,
+		GnssDbscanPageComponent,
+		GnssKMeansPageComponent
 	],
-	providers: [MainPageService, SecondPageService, KMeansPageService, GnssService]
+	providers: [MainPageService, SecondPageService, KMeansPageService, GnssService, GnssDbscanService, GnssKMeansPageService]
 })
 export class PagesModule { }

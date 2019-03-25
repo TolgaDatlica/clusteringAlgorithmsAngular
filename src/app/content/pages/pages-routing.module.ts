@@ -5,6 +5,8 @@ import { MainPageComponent } from './mainpage/mainpage.component';
 import { SecondPageComponent } from './secondpage/secondpage.component';
 import { KMeansPageComponent } from './kmeanspage/kmeanspage.component';
 import { GnssPageComponent } from './gnss/gnss.component';
+import { GnssDbscanPageComponent } from './gnssdbscan/gnssdbscan.component';
+import { GnssKMeansPageComponent } from './gnsskmeans/gnsskmeanspage.component';
 const routes: Routes = [
 	{
 		path: '',
@@ -21,6 +23,14 @@ const routes: Routes = [
 	{
 		path: 'gnss',
 		component: GnssPageComponent,
+	},
+	{
+		path: 'gnssdbscan1',
+		component: GnssDbscanPageComponent,
+	},
+	{
+		path: 'gnsskmeans1',
+		component: GnssKMeansPageComponent,
 	},
 ];
 
