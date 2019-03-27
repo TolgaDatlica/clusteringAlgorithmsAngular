@@ -7,6 +7,9 @@ import { KMeansPageComponent } from './kmeanspage/kmeanspage.component';
 import { GnssPageComponent } from './gnss/gnss.component';
 import { GnssDbscanPageComponent } from './gnssdbscan/gnssdbscan.component';
 import { GnssKMeansPageComponent } from './gnsskmeans/gnsskmeanspage.component';
+import { MLSPageComponent } from './mlspage/mlspage.component';
+import { CombainPageComponent } from './combainpage/combainpage.component';
+import { SpatioTemporalPageComponent } from './spatiotemporal/spatiotemporal.component';
 const routes: Routes = [
 	{
 		path: '',
@@ -31,6 +34,18 @@ const routes: Routes = [
 	{
 		path: 'gnsskmeans1',
 		component: GnssKMeansPageComponent,
+	},
+	{
+		path: 'mls',
+		component: MLSPageComponent,
+	},
+	{
+		path: 'combain',
+		component: CombainPageComponent,
+	},
+	{
+		path: 'st',
+		component: SpatioTemporalPageComponent,
 	},
 ];
 

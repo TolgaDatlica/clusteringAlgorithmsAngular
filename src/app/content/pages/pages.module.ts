@@ -19,6 +19,12 @@ import { GnssDbscanPageComponent } from './gnssdbscan/gnssdbscan.component';
 import { GnssDbscanService } from './gnssdbscan/gnssdbscan.service';
 import { GnssKMeansPageComponent } from './gnsskmeans/gnsskmeanspage.component';
 import { GnssKMeansPageService } from './gnsskmeans/gnsskmeanspage.service';
+import { MLSPageComponent } from './mlspage/mlspage.component';
+import { MLSPageService } from './mlspage/mlspage.service';
+import { CombainPageComponent } from './combainpage/combainpage.component';
+import { CombainPageService } from './combainpage/combainpage.service';
+import { SpatioTemporalPageComponent } from './spatiotemporal/spatiotemporal.component';
+import { SpatioTemporalService } from './spatiotemporal/spatiotemporal.service';
 @NgModule({
 	imports: [
 		CommonModule,
@@ -35,8 +41,12 @@ import { GnssKMeansPageService } from './gnsskmeans/gnsskmeanspage.service';
 		KMeansPageComponent,
 		GnssPageComponent,
 		GnssDbscanPageComponent,
-		GnssKMeansPageComponent
+		GnssKMeansPageComponent,
+		MLSPageComponent,
+		CombainPageComponent,
+		SpatioTemporalPageComponent
 	],
-	providers: [MainPageService, SecondPageService, KMeansPageService, GnssService, GnssDbscanService, GnssKMeansPageService]
+	providers: [MainPageService, SecondPageService, KMeansPageService, GnssService, GnssDbscanService, GnssKMeansPageService,
+		MLSPageService, CombainPageService, SpatioTemporalService]
 })
 export class PagesModule { }
