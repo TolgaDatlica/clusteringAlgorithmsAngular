@@ -10,6 +10,7 @@ import { GnssKMeansPageComponent } from './gnsskmeans/gnsskmeanspage.component';
 import { MLSPageComponent } from './mlspage/mlspage.component';
 import { CombainPageComponent } from './combainpage/combainpage.component';
 import { SpatioTemporalPageComponent } from './spatiotemporal/spatiotemporal.component';
+import { SkyHookPageComponent } from './skyhookpage/skyhookpage.component';
 const routes: Routes = [
 	{
 		path: '',
@@ -42,6 +43,10 @@ const routes: Routes = [
 	{
 		path: 'combain',
 		component: CombainPageComponent,
+	},
+	{
+		path: 'skyhook',
+		component: SkyHookPageComponent,
 	},
 	{
 		path: 'st',

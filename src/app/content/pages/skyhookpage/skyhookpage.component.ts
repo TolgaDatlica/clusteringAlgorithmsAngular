@@ -1,6 +1,6 @@
 
 import { Component, OnInit, ViewChild, AfterViewInit, Renderer2, ElementRef } from '@angular/core';
-import { CombainPageService } from './combainpage.service';
+import { SkyHookPageService } from './skyhookpage.service';
 import { NgForm } from '@angular/forms';
 import Map from 'ol/Map';
 import Vector from 'ol/source/Vector';
@@ -21,11 +21,11 @@ import * as geom from 'ol/geom';
 import { toLonLat } from 'ol/proj';
 import { toStringHDMS } from 'ol/coordinate';
 @Component({
-  selector: 'combainpage',
-  styleUrls: ['combainpage.component.scss'],
-  templateUrl: './combainpage.component.html',
+  selector: 'skyhookpage',
+  styleUrls: ['skyhookpage.component.scss'],
+  templateUrl: './skyhookpage.component.html',
 })
-export class CombainPageComponent implements OnInit, AfterViewInit {
+export class SkyHookPageComponent implements OnInit, AfterViewInit {
   public graph = {
     data: [],
     layout: { width: 600, height: 700, title: 'Graph' }
@@ -80,8 +80,8 @@ export class CombainPageComponent implements OnInit, AfterViewInit {
     textjson: 'giriniz'
   };
   wifilist = [];
-  constructor(private mainPageService: CombainPageService, private renderer: Renderer2, private elementRef: ElementRef,
-              private sampleService: CombainPageService) {
+  constructor(private mainPageService: SkyHookPageService, private renderer: Renderer2, private elementRef: ElementRef,
+              private sampleService: SkyHookPageService) {
   }
   ngAfterViewInit() {
   }
@@ -127,6 +127,7 @@ export class CombainPageComponent implements OnInit, AfterViewInit {
         wifiObject.wifiAccessPoints.push(object);
       });
       this.mainPageService.getWifiResult(wifiObject).subscribe(res => {
+        debugger;
         if (res.location) {
           this.wifilist.push({
             lat: res.location.lat,

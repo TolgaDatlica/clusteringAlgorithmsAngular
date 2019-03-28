@@ -4,7 +4,7 @@ import { map, catchError, tap, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 @Injectable()
-export class CombainPageService {
+export class SkyHookPageService {
     public headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     // tslint:disable-next-line:max-line-length
     public sampleData1 = { "Cmd": "Position", "Et": "5C94BBE1", "IMEI": "864547036476625", "Type": "53", "Source": "1", "Lat": "0.00000", "Long": "0.00000", "Alt": "0", "Error": "0", "Batt": "3775", "WIFI": [{ "MAC": "00:1c:7b:78:c0:76", "SSID": "", "RSSI": "-84" }, { "MAC": "b0:4e:26:b9:b4:b0", "SSID": "", "RSSI": "-84" }, { "MAC": "a0:e4:cb:b0:63:77", "SSID": "", "RSSI": "-90" }, { "MAC": "5c:f4:ab:49:11:88", "SSID": "", "RSSI": "-90" }, { "MAC": "90:ef:68:12:a8:43", "SSID": "", "RSSI": "-89" }, { "MAC": "f8:a9:63:b8:91:33", "SSID": "", "RSSI": "-92" }, { "MAC": "88:d7:f6:5e:4f:c0", "SSID": "", "RSSI": "-93" }], "Temp": "26.8", "CRC": "B12F" }
@@ -22,45 +22,93 @@ export class CombainPageService {
     ) {
     }
     public getWifiResult(macObject): Observable<any> {
-        debugger;
+        // Set your HttpHeaders to ask for XML.
+        const httpOptions = {
+            headers: new HttpHeaders({
+                'Content-Type': 'text/xml',
+                'Accept': 'text/xml',
+                'Response-Type': 'text'
+            })
+        };
+        let postedData =
+        `<LocationRQ xmlns="http://skyhookwireless.com/wps/2005"
+        version="2.24"
+        street-address-lookup="full">
+        <authentication version="2.2">
+        <key key="eJwVwcENwCAMA8A3w0SKm6DGT8BiKcTuVe_Q4L-qh-3s_i5X0kYgLTpoU0ErqsSJFP1-EWILHQ" username="mdatlica@atel.com.tr"/>
+        </authentication>`;
+        macObject.wifiAccessPoints.forEach(element => {
+            postedData += `<access-point>
+            <mac>` + (element.macAddress.replace(/:/g, "")).toUpperCase() + `</mac>
+            <ssid></ssid>
+            <signal-strength>` + element.signalStrength + `</signal-strength>
+            <age>20000</age>
+            </access-point>`;
+        });
+        // postedData += `<access-point>
+        //     <mac>E01C413B9414</mac>
+        //     <ssid>SkyFi-Corp</ssid>
+        //     <signal-strength>-66</signal-strength>
+        //     <age>5</age>
+        // </access-point>
+        // <access-point>
+        //     <mac>E01C413BD528</mac>
+        //     <ssid>SkyFi-Corp</ssid>
+        //     <signal-strength>-63</signal-strength>
+        //     <age>6</age>
+        // </access-point>
+        // <access-point>
+        //     <mac>E01C413BD514</mac>
+        //     <ssid>SkyFi-Corp</ssid>
+        //     <signal-strength>-68</signal-strength>
+        //     <age>4</age>
+        // </access-point>`
+        postedData += `</LocationRQ>`;
+
+        // debugger;
+        // return this.http.post('https://api.skyhookwireless.com/wps2/location', postedData, httpOptions)
+        //     .pipe(catchError(
+        //         e => throwError(e)
+        //     )
+        //     );
         let result = {};
         if (macObject.wifiAccessPoints[0].signalStrength === -84) {
             result = {
                 "location": {
-                    "lat": 39.87557,
-                    "lng": 32.86321
+                    "lat": 39.875823,
+                    "lng": 32.863418
                 },
                 "accuracy": 19
             };
         } else if (macObject.wifiAccessPoints[0].signalStrength === -91) {
             result ={
                 "location": {
-                    "lat": 39.89885,
-                    "lng": 32.84484
+                    "lat": 39.897862,
+                    "lng": 32.845216
                 },
                 "accuracy": 27
             };
         } else if (macObject.wifiAccessPoints[0].signalStrength === -68) {
             result = {
                 "location": {
-                    "lat": 39.89911,
-                    "lng": 32.84516
+                    "lat": 39.898227,
+                    "lng": 32.845174
                 },
                 "accuracy": 30
             };
         } else if (macObject.wifiAccessPoints[0].signalStrength === -67) {
             result = {
                 "location": {
-                    "lat": 39.87556,
-                    "lng": 32.86311
+                    "lat": 39.875775,
+                    "lng": 32.863787
                 },
                 "accuracy": 14
             };
         } else if (macObject.wifiAccessPoints[0].signalStrength === -72) {
             result = {
                 "location": {
-                    "lat": 39.87561,
-                    "lng": 32.86317
+                    "lat": 39.875949,
+                    "lng": 32.863871
                 },
                 "accuracy": 14
             };
@@ -69,15 +117,12 @@ export class CombainPageService {
         const studentsObservable = new Observable(observer => {
                 observer.next(result);
         });
-
         return studentsObservable;
-        // return this.http.post('https://cps.combain.com?key=4luhgsel06v2p5n66pph', JSON.stringify(macObject), {
-        //     headers: this.headers
-        // })
-        //     .pipe(catchError(
-        //         e => throwError(e)
-        //     )
-        //     );
+
+    }
+    replaceAll(stringItem, str1, str2, ignore) {
+        // tslint:disable-next-line:max-line-length
+        return stringItem.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
     }
     public getColorIcon(clusternumber: any) {
         let result = { Color: '(0,0,0)', Icon: 'assets/error.png' };

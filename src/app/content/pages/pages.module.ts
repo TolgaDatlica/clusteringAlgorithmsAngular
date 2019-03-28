@@ -25,6 +25,8 @@ import { CombainPageComponent } from './combainpage/combainpage.component';
 import { CombainPageService } from './combainpage/combainpage.service';
 import { SpatioTemporalPageComponent } from './spatiotemporal/spatiotemporal.component';
 import { SpatioTemporalService } from './spatiotemporal/spatiotemporal.service';
+import { SkyHookPageComponent } from './skyhookpage/skyhookpage.component';
+import { SkyHookPageService } from './skyhookpage/skyhookpage.service';
 @NgModule({
 	imports: [
 		CommonModule,
@@ -44,9 +46,10 @@ import { SpatioTemporalService } from './spatiotemporal/spatiotemporal.service';
 		GnssKMeansPageComponent,
 		MLSPageComponent,
 		CombainPageComponent,
-		SpatioTemporalPageComponent
+		SpatioTemporalPageComponent,
+		SkyHookPageComponent
 	],
 	providers: [MainPageService, SecondPageService, KMeansPageService, GnssService, GnssDbscanService, GnssKMeansPageService,
-		MLSPageService, CombainPageService, SpatioTemporalService]
+		MLSPageService, CombainPageService, SpatioTemporalService, SkyHookPageService]
 })
 export class PagesModule { }
