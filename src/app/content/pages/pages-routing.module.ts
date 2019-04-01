@@ -11,6 +11,8 @@ import { MLSPageComponent } from './mlspage/mlspage.component';
 import { CombainPageComponent } from './combainpage/combainpage.component';
 import { SpatioTemporalPageComponent } from './spatiotemporal/spatiotemporal.component';
 import { SkyHookPageComponent } from './skyhookpage/skyhookpage.component';
+import { GoogleLocationPageComponent } from './googlelocation/googlelocation.component';
+import { NavizonPageComponent } from './navizonpage/navizonpage.component';
 const routes: Routes = [
 	{
 		path: '',
@@ -51,6 +53,14 @@ const routes: Routes = [
 	{
 		path: 'st',
 		component: SpatioTemporalPageComponent,
+	},
+	{
+		path: 'google',
+		component: GoogleLocationPageComponent,
+	},
+	{
+		path: 'navizon',
+		component: NavizonPageComponent,
 	},
 ];
 

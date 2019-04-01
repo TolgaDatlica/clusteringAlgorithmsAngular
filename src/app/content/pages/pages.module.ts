@@ -27,6 +27,10 @@ import { SpatioTemporalPageComponent } from './spatiotemporal/spatiotemporal.com
 import { SpatioTemporalService } from './spatiotemporal/spatiotemporal.service';
 import { SkyHookPageComponent } from './skyhookpage/skyhookpage.component';
 import { SkyHookPageService } from './skyhookpage/skyhookpage.service';
+import { GoogleLocationPageComponent } from './googlelocation/googlelocation.component';
+import { GoogleLocationPageService } from './googlelocation/googlelocation.service';
+import { NavizonPageComponent } from './navizonpage/navizonpage.component';
+import { NavizonPageService } from './navizonpage/navizonpage.service';
 @NgModule({
 	imports: [
 		CommonModule,
@@ -47,9 +51,11 @@ import { SkyHookPageService } from './skyhookpage/skyhookpage.service';
 		MLSPageComponent,
 		CombainPageComponent,
 		SpatioTemporalPageComponent,
-		SkyHookPageComponent
+		SkyHookPageComponent,
+		GoogleLocationPageComponent,
+		NavizonPageComponent
 	],
 	providers: [MainPageService, SecondPageService, KMeansPageService, GnssService, GnssDbscanService, GnssKMeansPageService,
-		MLSPageService, CombainPageService, SpatioTemporalService, SkyHookPageService]
+		MLSPageService, CombainPageService, SpatioTemporalService, SkyHookPageService, GoogleLocationPageService, NavizonPageService]
 })
 export class PagesModule { }
